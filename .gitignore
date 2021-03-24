@@ -1,0 +1,12 @@
+*~
+.*.swp
+bin/*
+config/*
+deb/*
+hosts/*
+key/*
+log/*
+rpm/*
+src/*
+work/*
+!.gitkeep
