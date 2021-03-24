@@ -29,9 +29,9 @@ Because it is easy to use such as options.
   * You acquire knowledge that you can make use of whichever company you go to.
 
 
-## How to use fh
+## How to use fh.sh
 ```
-$ fh -h
+$ ./fh.sh -h
 Usage: ./fh.sh  [options]
 
 Options:
