@@ -1,10 +1,10 @@
 #!/bin/bash
 #=============================================================
-VERSION="2.0.1"
+VERSION="2.0.0 beta"
 
 usage_exit() {
 cat <<HELP
-Usage: $0  [options] 
+Usage: fh  [options] 
 
 Options:
     -h, --help              show this help message and exit
@@ -27,20 +27,20 @@ Options:
 
 
 Example of Execute in Local Host:
-  $0 -c uname -n
-  $0 -s script/test1.sh
-  $0 -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
-  $0 -o outputfile -c uname -n
-  $0 -o -c uname -n   # default outputfile
+  fh -c uname -n
+  fh -s script/test1.sh
+  fh -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
+  fh -o outputfile -c uname -n
+  fh -o -c uname -n   # default outputfile
 
 Example f Execute in Remote Host:
-  $0 -H host1 -c uname -n
-  $0 -H host1,host2 -c uname -n
-  $0 -H host1,host2 -s script/test1.sh
-  $0 -H hostlist -s script/test1.sh
+  fh -H host1 -c uname -n
+  fh -H host1,host2 -c uname -n
+  fh -H host1,host2 -s script/test1.sh
+  fh -H hostlist -s script/test1.sh
 HELP
 }
-#===========================================================
+#=============================================================
 
 PROGNAME=$(basename $0)
 SCRIPTDIR=$(cd $(dirname $0); pwd)
@@ -50,9 +50,13 @@ LOCALHOME="$HOME/fasthandle"
 LOCALWORK="$LOCALHOME/work"
 LOCALLOG="$LOCALHOME/log"
 
-REMOTEHOME="$HOME/fasthandle"
-REMOTEWORK="$REMOTEHOME/work"
-REMOTELOG="$REMOTEHOME/log"
+#REMOTEHOME="$HOME/fasthandle"
+#REMOTEWORK="$REMOTEHOME/work"
+#REMOTELOG="$REMOTEHOME/log"
+
+#REMOTEHOME="$HOME/fasthandle"
+REMOTEWORK="/tmp"
+#REMOTELOG="$REMOTEHOME/log"
 
 
 if [ -z "${SCRIPTDIR}/fh.conf" ] ; then
