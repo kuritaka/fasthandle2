@@ -55,8 +55,8 @@ REMOTEWORK="$REMOTEHOME/work"
 REMOTELOG="$REMOTEHOME/log"
 
 
-if [ -z "${SCRIPTDIR}/fh.env" ] ; then
-    source ${SCRIPTDIR}/fh.env
+if [ -z "${SCRIPTDIR}/fh.conf" ] ; then
+    source ${SCRIPTDIR}/fh.conf
 fi
 
 
