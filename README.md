@@ -17,7 +17,7 @@ And Fasthandle 1 is best practice for python fabric.
 But in FastHandle 2, I make fh command. It works like python fabric.
 And I was improving it to make it easier to use.
 
-## FastHandle Characteristic
+## Features
 
 * Simple
   * Less learning cost
@@ -30,7 +30,7 @@ And I was improving it to make it easier to use.
   * You acquire knowledge that you can make use of whichever company you go to.
 
 
-## How to use fh command
+## Usage
 ```
 $ fh -h
 Usage: ./fh  [options]
@@ -69,7 +69,7 @@ Example Remote:
   fh -H hostlist -s script/test.sh:uname_n
 ```
 
-## Preparation
+## Setup
 
 ### Simple(Only fh command)
 ```
@@ -89,6 +89,13 @@ Example Remote:
 
 ~]$ echo 'export PATH="$PATH:/home/$USER/fasthandle/fhscripts:."' >> .bashrc
 ```
+
+
+## Dependencies
+* bash
+* ssh
+* scp
+
 
 
 ## Best Practices
@@ -118,4 +125,8 @@ $ tree
 ```
 
 
+## License
+This software is released under the MIT License, see LICENSE.
 
+## Authors
+Takaaki Kurihara
