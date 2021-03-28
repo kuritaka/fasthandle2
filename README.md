@@ -17,6 +17,7 @@ And Fasthandle 1 is best practice for python fabric.
 But in FastHandle 2, I make fh command. It works like python fabric.
 And I was improving it to make it easier to use.
 
+
 ## Features
 
 * Simple
@@ -28,6 +29,45 @@ And I was improving it to make it easier to use.
 * Mangage from 1 server to over 1,000 servers
 * Knowledge Base for Linux Configuration , Testing and Operation 
   * You acquire knowledge that you can make use of whichever company you go to.
+
+
+## Setup
+### What to do if you have root privileges 
+```
+~]$ curl -o fh https://raw.githubusercontent.com/kuritaka/fasthandle2/main/fhscripts/fh.sh
+~]$ chmod 755 fh
+~]$ sudo mv  -i fh  /bin/
+~]$ fh -h
+```
+
+
+### How to do with user privileges 
+```
+~]$ cd /home/$USER
+~]$ mkdir bin
+~]$ cd bin
+~]$ curl -o fh https://raw.githubusercontent.com/kuritaka/fasthandle2/main/fhscripts/fh.sh
+~]$ chmod 755 fh
+~]$ export PATH="$PATH:/home/$USER/bin:." >>  .bashrc
+~]$ exit
+
+#login
+~]$ fh -h
+```
+
+
+### Configuration
+fh command work without fh.conf.
+
+If you want to change configuration, you can use fh.conf.
+fh command read fh.conf from USER Home Directory or fh command directory.
+If there are multiple parameters, USER Home Directory's hf.conf is use.
+
+```
+~]$ cd /home/$USER
+~]$ curl -O https://raw.githubusercontent.com/kuritaka/fasthandle2/main/fhscripts/fh.conf
+```
+
 
 
 ## Usage
@@ -69,27 +109,6 @@ Example Remote:
   fh -H hostlist -s script/test.sh:uname_n
 ```
 
-## Setup
-
-### Simple(Only fh command)
-```
-~]$ curl -O https://raw.githubusercontent.com/kuritaka/fasthandle2/main/fhscripts/fh
-~]$ chmod 755 fh
-~]$ ./fh -h
-```
-
-
-### Best Practice (fh command and directory and sample shell script etc)
-```
-~]$ cd /home/$USER
-~]$ git clone https://github.com/kuritaka/fasthandle2.git  fasthandle
-~]$ chmod 755 fasthandle/fhscript/fh
-~]$ export PATH="$PATH:/home/$USER/fasthandle/fhscripts:."
-~]$ fh -h
-
-~]$ echo 'export PATH="$PATH:/home/$USER/fasthandle/fhscripts:."' >> .bashrc
-```
-
 
 ## Dependencies
 * bash
@@ -100,6 +119,8 @@ Example Remote:
 
 ## Best Practices
 
+https://github.com/kuritaka/fasthandle2-best-practices
+
 ### Directory Layout
 ```
 $ tree
@@ -108,9 +129,6 @@ $ tree
 |-- bin
 |-- config
 |-- deb
-|-- fhscripts
-|   |-- fh.conf
-|   `-- fh
 |-- hosts
 |   `-- hostlist
 |-- key
