@@ -1,5 +1,11 @@
 #!/bin/bash
 #=============================================================
+# Script name : fh (FastHandle)
+# Description : deploy tool like python fabric
+# Author      : Takaaki Kurihara
+# Refarence:
+# https://github.com/kuritaka/fasthandle2
+#
 VERSION="2.0.0 beta"
 
 usage_exit() {
@@ -26,18 +32,19 @@ Options:
     -p PORT, --port=PORT    Port to connect to on the remote host.
 
 
-Example of Execute in Local Host:
-  fh -c uname -n
-  fh -s script/test1.sh
-  fh -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
-  fh -o outputfile -c uname -n
-  fh -o -c uname -n   # default outputfile
+Usage:
+  Execute in Local Host:
+    fh -c uname -n
+    fh -s script/test1.sh
+    fh -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
+    fh -o outputfile -c uname -n
+    fh -o -c uname -n   # default outputfile
 
-Example f Execute in Remote Host:
-  fh -H host1 -c uname -n
-  fh -H host1,host2 -c uname -n
-  fh -H host1,host2 -s script/test1.sh
-  fh -H hostlist -s script/test1.sh
+  Execute in Remote Host:
+    fh -H host1 -c uname -n
+    fh -H host1,host2 -c uname -n
+    fh -H host1,host2 -s script/test1.sh
+    fh -H hostlist -s script/test1.sh
 HELP
 }
 #=============================================================
@@ -45,32 +52,15 @@ HELP
 PROGNAME=$(basename $0)
 SCRIPTDIR=$(cd $(dirname $0); pwd)
 
-#Default Path
-LOCALHOME="$HOME/fasthandle"
-LOCALWORK="$LOCALHOME/work"
-LOCALLOG="$LOCALHOME/log"
-
-#REMOTEHOME="$HOME/fasthandle"
-#REMOTEWORK="$REMOTEHOME/work"
-#REMOTELOG="$REMOTEHOME/log"
-
-#REMOTEHOME="$HOME/fasthandle"
+#Default parameters
 REMOTEWORK="/tmp"
-#REMOTELOG="$REMOTEHOME/log"
 
+[ -f "/etc/fh.conf" ] && source /etc/fh.conf
+[ -f "${SCRIPTDIR}/fh.conf" ]  && source ${SCRIPTDIR}/fh.conf
+[ -f "~/.fh.conf" ] &&  source ~/.fh.conf
 
-if [ -z "${SCRIPTDIR}/fh.conf" ] ; then
-    source ${SCRIPTDIR}/fh.conf
-fi
-
-
-#===============================================
-[ ! -d ${LOCALHOME} ] && mkdir -p ${LOCALHOME}
-[ ! -d ${LOCALWORK} ] && mkdir -p ${LOCALWORK}
-[ ! -d ${LOCALLOG} ] && mkdir -p ${LOCALLOG}
 
 #Function
-
 host_parce(){
     #Check File
     if [ -f "$ARGHOST" ]; then

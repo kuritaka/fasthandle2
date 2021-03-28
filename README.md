@@ -57,15 +57,20 @@ And I was improving it to make it easier to use.
 
 
 ### Configuration
-fh command work without fh.conf.
+fh command work without configuration.
 
-If you want to change configuration, you can use fh.conf.
-fh command read fh.conf from USER Home Directory or fh command directory.
-If there are multiple parameters, USER Home Directory's hf.conf is use.
+If you want to change configuration, you can use .fh.conf of USER Home Directory or fh.conf of fh command directory or /etc/fh.conf.
+If there are multiple parameters, USER Home Directory's hf.conf is used.
+If there are fh.conf of fh command directory or /etc/fh.conf, fh.conf of fh command directory is used.
 
 ```
-~]$ cd /home/$USER
+~]$ cd /etc
 ~]$ curl -O https://raw.githubusercontent.com/kuritaka/fasthandle2/main/fhscripts/fh.conf
+
+or
+
+~]$ cd /home/$USER
+~]$ curl -o .fh.conf https://raw.githubusercontent.com/kuritaka/fasthandle2/main/fhscripts/fh.conf
 ```
 
 
