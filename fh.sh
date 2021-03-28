@@ -10,7 +10,7 @@ VERSION="2.0.0 beta"
 
 usage_exit() {
 cat <<HELP
-Usage: fh  [options] 
+Usage: fh  [options]
 
 Options:
     -h, --help              show this help message and exit

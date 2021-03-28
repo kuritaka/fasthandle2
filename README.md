@@ -78,17 +78,17 @@ or
 ## Usage
 ```
 $ fh -h
-Usage: ./fh  [options]
+Usage: fh  [options]
 
 Options:
     -h, --help              show this help message and exit
     --version               show program's version number and exit
     -v, --verbose           verbose mode
-    -H HOST, --hosts=HOST   
-    -H HOST1,HOST2, --hosts=HOST1,HOST2
+    -H HOST1[,HOST2], --hosts=HOST1[,HOST2]
     -H FILE
                             comma-separated list of hosts to operate on
-    -o [OUTPUTFILE]           Write output to <file> instead of stdout
+    -o OUTPUTFILE, --output=OUTPUTFILE
+                            Write output to <file> instead of stdout
     -c COMMAND, --command=COMMAND
                             Execute COMMAND
     -s SHELLSCRIPT          Execute ShellScript
@@ -98,20 +98,21 @@ Options:
 
     -u USER, --user=USER    username to use when connecting to remote hosts
     -i PRIVATEKEY           SSH private key file.
+    -p PORT, --port=PORT    Port to connect to on the remote host.
 
 
-Example Local:
-  fh -c uname -n
-  fh -s script/test1.sh
-  fh -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
-  fh -o outputfile -c uname -n
-  fh -o -c uname -n   # default outputfile
+Usage:
+  Execute in Local Host:
+    fh -c uname -n
+    fh -s script/test1.sh
+    fh -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
+    fh -o outputfile -c uname -n
 
-Example Remote:
-  fh -H host1 -c uname -n
-  fh -H host1,host2 -c uname -n
-  fh -H host1,host2 -s script/test.sh:uname_n
-  fh -H hostlist -s script/test.sh:uname_n
+  Execute in Remote Host:
+    fh -H host1 -c uname -n
+    fh -H host1,host2 -c uname -n
+    fh -H host1,host2 -s script/test1.sh
+    fh -H hostlist -s script/test1.sh
 ```
 
 
