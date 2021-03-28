@@ -19,7 +19,8 @@ Options:
     -H HOST1[,HOST2], --hosts=HOST1[,HOST2]
     -H FILE
                             comma-separated list of hosts to operate on
-    -o [OUTPUTFILE]         Write output to <file> instead of stdout
+    -o OUTPUTFILE, --output=OUTPUTFILE
+                            Write output to <file> instead of stdout
     -c COMMAND, --command=COMMAND
                             Execute COMMAND
     -s SHELLSCRIPT          Execute ShellScript
@@ -38,7 +39,6 @@ Usage:
     fh -s script/test1.sh
     fh -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
     fh -o outputfile -c uname -n
-    fh -o -c uname -n   # default outputfile
 
   Execute in Remote Host:
     fh -H host1 -c uname -n
@@ -74,12 +74,27 @@ host_parce(){
 }
 
 out_parce(){
-    OUTFILE=$(echo $OUT)
-
-    if [ -z "$OUTFILE" ] ; then
-        OUTFILE="${LOCALLOG}/$(date +%Y%m%d_%H%M%S).log"
+    if [ -z "${OUT}" ] ; then
+        echo "[Critical Message] output file is null"
+        exit 1
     else
-        OUTFILE="${LOCALLOG}/${OUTFILE}"
+        if [ -f "${OUT}" ]  ; then
+            echo ""
+            echo -n -e "File ${OUT}  already exits. Overwrite? [y/n]"
+            read NUM
+            case ${NUM} in
+              y|Y) cp /dev/null "${OUT}"
+                   ;;
+              n|N) echo "quit"
+                   exit 1
+                   ;;
+              *) echo "exit : no selection is missed."
+                 exit 1
+                 ;;
+            esac
+        fi
+
+        OUTFILE="${OUT}"
     fi
     #OUTTEE=" 2>&1 | tee -a $OUTFILE"
 

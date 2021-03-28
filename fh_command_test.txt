@@ -1,6 +1,11 @@
 #fh command test
 
+#############################################
+# test environment
+#############################################
 export PATH="$PATH:`pwd`:."
+alias fh=fh.sh
+
 
 #############################################
 # TEST(1) Not Need Host
@@ -15,6 +20,7 @@ fh --version
 #Local Command
 fh -c uname -n
 
+fh -o /tmp/test.out -c uname -n
 
 #Local File
 fh -s ../script/test.sh:uname_n
