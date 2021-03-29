@@ -124,6 +124,7 @@ Usage:
 * bash
 * ssh
 * scp
+* sshpass
 
 
 

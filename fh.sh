@@ -30,8 +30,11 @@ Options:
     control as whom and how to connect to hosts
 
     -u USER, --user=USER    username to use when connecting to remote hosts
+    -p, -p PASSWORD, --password, --password=PASSWORD
+                            ssh password
+                            If you do not specify a password, an input field will appear. 
     -i PRIVATEKEY           SSH private key file.
-    -p PORT, --port=PORT    Port to connect to on the remote host.
+    -P PORT, --port=PORT    Port to connect to on the remote host.
 
 
 Usage:
@@ -74,6 +77,12 @@ host_parce(){
     fi
 
     echo "HOST : $(echo $HOST)"
+}
+
+pass_parce(){
+    read -sp "ssh password:" PASS
+    echo ""
+    SSHPASS="sshpass -p $PASS"
 }
 
 out_parce(){
@@ -200,6 +209,10 @@ do
         -d | --debug)
             DEBUG_FLAG="true"
             ;;
+        -i )
+            SSHKEY="-i $2"
+            shift
+            ;;
         -u | --user*)
             if [[ "$1" =~ "--user" ]] ; then
                 SSHUSER=$(echo $1 | awk -F= '{ print $2"@" }')
@@ -208,11 +221,27 @@ do
                 shift
             fi
             ;;
-        -i )
-            SSHKEY="-i $2"
-            shift
+        -p | --password*)
+            if [[ "$1" =~ "--password" ]] ; then
+                if [[ "$1" =~ "--password=" ]] ; then
+                    #--password PASSWORD
+                    SSHPASS=$(echo $1 | awk -F= '{ print "sshpass -p "$2 }')
+                else
+                    #--password only
+                    pass_parce
+                fi
+            else
+                if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                    #-p only
+                    pass_parce
+                else
+                    #-p PASSWORD
+                    SSHPASS="sshpass -p $2"
+                    shift
+                fi
+            fi
             ;;
-        -p | --port*)
+        -P | --port*)
             if [[ "$1" =~ "--port" ]] ; then
                 SSHPORT=$(echo $1 | awk -F= '{ print $2 }')
             else
@@ -348,27 +377,29 @@ do
 
     if [ -z "${FILE}" ] ; then
         if [ -z "${OUTFILE}" ] ; then
-            ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${COMMAND}
+            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${COMMAND}
         else
-            ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} "${COMMAND}" 2>&1 | tee -a  ${OUTFILE}
+            echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} \"${COMMAND}\""  >>  ${OUTFILE}
+            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} "${COMMAND}" 2>&1 | tee -a  ${OUTFILE}
         fi
     else
         #Create Work Directory
-        ssh -n ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
+        ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
 
         #SCP
         for i in ${FILE_UNIQ}
         do
-            scp ${SSHKEY} ${SSHVERV} $i ${SSHUSER}${H}:${REMOTEWORK}
+            ${SSHPASS} scp ${SSHKEY} ${SSHVERV} $i ${SSHUSER}${H}:${REMOTEWORK}
         done
 
         #Execute
         for array in "${arrays[@]}"
         do
             if [ -z "${OUTFILE}" ] ; then
-                ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} bash ${BASHVERV} "${REMOTEWORK}/${array}"
+                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} bash ${BASHVERV} "${REMOTEWORK}/${array}"
             else
-                ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
+                echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} bash ${BASHVERV} \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
+                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
             fi
         done
     fi
