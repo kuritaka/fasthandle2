@@ -6,8 +6,6 @@ FastHandle is tools to make infrastructure construction operations and test oper
 FastHandle will make your operation faster and more accurate.  
 And FastHandle aims to improve Linux knowledge by looking at settings and commands on the official site.  
   
-https://fasthandle.net/
-
 
 ## What is difference between FastHandle 1 and FastHandle 2
 
@@ -36,7 +34,10 @@ And I was improving it to make it easier to use.
 ```
 ~]$ curl -o fh https://raw.githubusercontent.com/kuritaka/fasthandle2/main/fhscripts/fh.sh
 ~]$ chmod 755 fh
-~]$ sudo mv  -i fh  /bin/
+~]$ sudo mv  -i fh  /usr/local/bin/
+
+~]$ which fh
+/usr/local/bin/fh
 ~]$ fh -h
 ```
 
@@ -84,14 +85,14 @@ Options:
     -h, --help              show this help message and exit
     --version               show program's version number and exit
     -v, --verbose           verbose mode
-    -H HOST1[,HOST2], --hosts=HOST1[,HOST2]
-    -H FILE
-                            comma-separated list of hosts to operate on
+    -H HOST1[,HOST2], --hosts=HOST1[,HOST2], -H HOSTLISTFILE, --hosts=HOSTLISTFILE
+                            comma-separated list of hosts or <HOSTLISTFILE> to operate on
     -o OUTPUTFILE, --output=OUTPUTFILE
-                            Write output to <file> instead of stdout
-    -c COMMAND, --command=COMMAND
+                            Write output to bouth stdout and <OUTPUTFILE>
+    -- COMMAND, -c COMMAND, --command=COMMAND
                             Execute COMMAND
-    -s SHELLSCRIPT          Execute ShellScript
+    -f SHELLSCRIPT, --file=SHELLSCRIPT
+                            Execute ShellScript
 
   Connection Options:
     control as whom and how to connect to hosts
@@ -104,15 +105,15 @@ Options:
 Usage:
   Execute in Local Host:
     fh -c uname -n
-    fh -s script/test1.sh
-    fh -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
+    fh -f test1.sh
+    fh -f test1.sh:arg1,arg2 test2.sh:arg1,arg2
     fh -o outputfile -c uname -n
 
   Execute in Remote Host:
     fh -H host1 -c uname -n
     fh -H host1,host2 -c uname -n
-    fh -H host1,host2 -s script/test1.sh
-    fh -H hostlist -s script/test1.sh
+    fh -H host1,host2 -f test1.sh
+    fh -H hostlist -f test1.sh
 ```
 
 
@@ -121,32 +122,6 @@ Usage:
 * ssh
 * scp
 
-
-
-## Best Practices
-
-https://github.com/kuritaka/fasthandle2-best-practices
-
-### Directory Layout
-```
-$ tree
-.
-|-- README.md
-|-- bin
-|-- config
-|-- deb
-|-- hosts
-|   `-- hostlist
-|-- key
-|-- log
-|-- rpm
-|-- script
-|   |-- check_centos7.sh
-|   |-- test.sh
-|   `-- test.txt
-|-- src
-`-- work
-```
 
 
 ## License
