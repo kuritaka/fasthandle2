@@ -101,8 +101,11 @@ Options:
     control as whom and how to connect to hosts
 
     -u USER, --user=USER    username to use when connecting to remote hosts
+    -p, -p PASSWORD, --password, --password=PASSWORD
+                            ssh password
+                            If you do not specify a password, an input field will appear. 
     -i PRIVATEKEY           SSH private key file.
-    -p PORT, --port=PORT    Port to connect to on the remote host.
+    -P PORT, --port=PORT    Port to connect to on the remote host.
 
 
 Usage:
@@ -117,6 +120,7 @@ Usage:
     fh -H host1,host2 -c uname -n
     fh -H host1,host2 -f test1.sh
     fh -H hostlist -f test1.sh
+    fh -H host1 -o outputfile -c uname -n
 ```
 
 
