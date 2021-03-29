@@ -16,14 +16,14 @@ Options:
     -h, --help              show this help message and exit
     --version               show program's version number and exit
     -v, --verbose           verbose mode
-    -H HOST1[,HOST2], --hosts=HOST1[,HOST2]
-    -H FILE
-                            comma-separated list of hosts to operate on
+    -H HOST1[,HOST2], --hosts=HOST1[,HOST2], -H HOSTLISTFILE, --hosts=HOSTLISTFILE
+                            comma-separated list of hosts or <HOSTLISTFILE> to operate on
     -o OUTPUTFILE, --output=OUTPUTFILE
-                            Write output to <file> instead of stdout
-    -c COMMAND, --command=COMMAND
+                            Write output to bouth stdout and <OUTPUTFILE>
+    -- COMMAND, -c COMMAND, --command=COMMAND
                             Execute COMMAND
-    -s SHELLSCRIPT          Execute ShellScript
+    -f SHELLSCRIPT, --file=SHELLSCRIPT
+                            Execute ShellScript
 
   Connection Options:
     control as whom and how to connect to hosts
@@ -36,15 +36,15 @@ Options:
 Usage:
   Execute in Local Host:
     fh -c uname -n
-    fh -s script/test1.sh
-    fh -s script/test1.sh:arg1,arg2 script/test2.sh:arg1,arg2
+    fh -f test1.sh
+    fh -f test1.sh:arg1,arg2 test2.sh:arg1,arg2
     fh -o outputfile -c uname -n
 
   Execute in Remote Host:
     fh -H host1 -c uname -n
     fh -H host1,host2 -c uname -n
-    fh -H host1,host2 -s script/test1.sh
-    fh -H hostlist -s script/test1.sh
+    fh -H host1,host2 -f test1.sh
+    fh -H hostlist -f test1.sh
 HELP
 }
 #=============================================================
@@ -55,6 +55,7 @@ SCRIPTDIR=$(cd $(dirname $0); pwd)
 #Default parameters
 REMOTEWORK="/tmp"
 
+# /etc/fh.conf --> ${SCRIPTDIR}/fh.conf --> ~/.fh.conf
 [ -f "/etc/fh.conf" ] && source /etc/fh.conf
 [ -f "${SCRIPTDIR}/fh.conf" ]  && source ${SCRIPTDIR}/fh.conf
 [ -f "~/.fh.conf" ] &&  source ~/.fh.conf
@@ -256,8 +257,8 @@ do
             fi
             break
             ;;
-        -s | --shellscript )
-            if [[ "$1" =~ "--command" ]] ; then
+        -f | --file* )
+            if [[ "$1" =~ "--file" ]] ; then
                 FILE=$(echo $1 | awk -F= '{ {for(i=2;i<NF;i++)printf("%s ",$i) }print($NF) }')
                 file_parce
             else
