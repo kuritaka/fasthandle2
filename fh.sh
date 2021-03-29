@@ -16,6 +16,7 @@ Options:
     -h, --help              show this help message and exit
     --version               show program's version number and exit
     -v, --verbose           verbose mode
+    -d, --debug             debug mode
     -H HOST1[,HOST2], --hosts=HOST1[,HOST2], -H HOSTLISTFILE, --hosts=HOSTLISTFILE
                             comma-separated list of hosts or <HOSTLISTFILE> to operate on
     -o OUTPUTFILE, --output=OUTPUTFILE
@@ -45,6 +46,7 @@ Usage:
     fh -H host1,host2 -c uname -n
     fh -H host1,host2 -f test1.sh
     fh -H hostlist -f test1.sh
+    fh -H host1 -o outputfile -c uname -n
 HELP
 }
 #=============================================================
@@ -195,6 +197,9 @@ do
         -v | --verbose)
             VERV_FLAG="true"
             ;;
+        -d | --debug)
+            DEBUG_FLAG="true"
+            ;;
         -u | --user*)
             if [[ "$1" =~ "--user" ]] ; then
                 SSHUSER=$(echo $1 | awk -F= '{ print $2"@" }')
@@ -296,6 +301,9 @@ done
 
 echo ""
 if [ "$VERV_FLAG" == "true" ] ; then
+    SSHVERV=""
+    BASHVERV=""
+elif [ "$DEBUG_FLAG" == "true" ] ; then
     SSHVERV="-v"
     BASHVERV="-x"
 else

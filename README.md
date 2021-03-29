@@ -64,6 +64,8 @@ If you want to change configuration, you can use .fh.conf of USER Home Directory
 If there are multiple parameters, USER Home Directory's hf.conf is used.
 If there are fh.conf of fh command directory or /etc/fh.conf, fh.conf of fh command directory is used.
 
+/etc/fh.conf --> ${SCRIPTDIR}/fh.conf --> ~/.fh.conf
+
 ```
 ~]$ cd /etc
 ~]$ curl -O https://raw.githubusercontent.com/kuritaka/fasthandle2/main/fhscripts/fh.conf
@@ -85,6 +87,7 @@ Options:
     -h, --help              show this help message and exit
     --version               show program's version number and exit
     -v, --verbose           verbose mode
+    -d, --debug             debug mode
     -H HOST1[,HOST2], --hosts=HOST1[,HOST2], -H HOSTLISTFILE, --hosts=HOSTLISTFILE
                             comma-separated list of hosts or <HOSTLISTFILE> to operate on
     -o OUTPUTFILE, --output=OUTPUTFILE
