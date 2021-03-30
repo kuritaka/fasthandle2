@@ -39,20 +39,37 @@ Options:
 
 
 Usage:
-  Execute in Local Host:
+  Execute Commnad in Local Host:
     fh -c uname -n
+    fh -c 'uname -n; whoami'
+    fh -c 'echo $(uname -n)-------; whoami'
     fh -c whoami
+    fh -c 'sudo whoami'
     fh -s -c whoami
+
+  Execute ShellScript in Local Host:
     fh -f test.sh
     fh -f test.sh:cmd_whoami,uname_n
     fh -f test.sh:cmd_whoami,uname_n test2.sh:arg1,arg2
     fh -o outputfile -c uname -n
 
-  Execute in Remote Host:
+  Execute ShellScript in Remote Host:
     fh -H host1 -c uname -n
+    fh -H host1 -s -c whoami
+    fh -H host1 -c sudo whoami
+    fh -H host1 -c 'uname -n; whoami'
+    fh -H host1 -c 'sudo uname -n; sudo whoami'
+    fh -H host1 -s -c 'uname -n; whoami'
+    fh -H host1 -c 'echo $(uname -n)--------; whoami'
+    fh -H host1 -s -c 'echo $(uname -n)--------; whoami'
     fh -H host1,host2 -c uname -n
-    fh -H host1,host2 -f test1.sh
-    fh -H hostlist -f test1.sh
+    fh -H host1,host2 -s -c uname -n
+
+  Execute Command in Remote Host:
+    fh -H host1 -f test.sh:cmd_whoami
+    fh -H host1 -s -f test.sh:cmd_whoami
+    fh -H host1,host2 -f test.sh
+    fh -H hostlist -f test.sh:cmd_whoami
     fh -H host1 -o outputfile -c uname -n
 HELP
 }
@@ -389,10 +406,10 @@ do
 
     if [ -z "${FILE}" ] ; then
         if [ -z "${OUTFILE}" ] ; then
-            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} ${COMMAND}
+            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
         else
-            echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"${COMMAND}\""  >>  ${OUTFILE}
-            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "${COMMAND}" 2>&1 | tee -a  ${OUTFILE}
+            echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\" \" "  >>  ${OUTFILE}
+            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\"" 2>&1 | tee -a  ${OUTFILE}
         fi
     else
         #Create Work Directory

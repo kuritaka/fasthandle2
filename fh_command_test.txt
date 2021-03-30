@@ -31,14 +31,21 @@ fh -s ../script/test.sh:uname_n,ip_a ../script/test.sh:uname_n
 #############################################
 # TEST(3) Remote Host
 #############################################
-#Remote Command Test
+#Execute Command
 fh -H host1 -c uname -n
+fh -H host1 -c whoami
+fh -H host1 -c sudo whoami
+fh -H host1 -s -c whoami
+fh -H host1 -s -c "uname -n; uname -n"
+fh -H host1 -c 'sudo uname -n; sudo whoami'
+[OK] fh -H host1 -s -c "uname -n; whoami"
+[NG] fh -H host1 -s -c 'bash -c "uname -n; whoami"
 fh -H host1 -c 'egrep -i "mode|currently|status|count"  /proc/net/bonding/bond*'
 
 #Remote sudo Command Test
 fh -H host1 -c sudo whoami
 [OK] fh -H host1 -c sudo "cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`"
-[NG] fh -H host1 -c sudo cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`
+[OK] fh -H host1 -c sudo cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`
 [OK] fh -H host1 -o /tmp/test.out -c sudo "cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`"
 
 [OK] fh -H host1 -c sudo "bash -c 'echo "\\# Comment" >> /etc/hosts' "
