@@ -94,7 +94,7 @@ host_parce(){
 
     #Check File
     if [ -f "$ARG1" ]; then
-        HOST=$(grep -v "^#" $ARG1 | awk  '{ print $1}')
+        HOST=$(egrep -v "^#" $ARG1 |egrep "$GROUP" | awk  '{ print $1}')
     else
         H=`echo $ARGHOST | tr "," " "`
         HOST=`echo $H`
