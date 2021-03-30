@@ -41,6 +41,7 @@ fh -H host1 -c 'sudo uname -n; sudo whoami'
 [OK] fh -H host1 -s -c "uname -n; whoami"
 [NG] fh -H host1 -s -c 'bash -c "uname -n; whoami"
 fh -H host1 -c 'egrep -i "mode|currently|status|count"  /proc/net/bonding/bond*'
+fh -H hostlist  -c "uname -n"
 
 #Remote sudo Command Test
 fh -H host1 -c sudo whoami

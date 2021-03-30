@@ -89,9 +89,12 @@ REMOTEWORK="/tmp"
 
 #Function
 host_parce(){
+    ARG1=$(echo $ARGHOST |awk  -F: '{ print $1}')
+    GROUP=$(echo $ARGHOST |awk  -F: '{ print $2}')
+
     #Check File
-    if [ -f "$ARGHOST" ]; then
-        HOST=$(grep -v "^#" $ARGHOST | awk '{ print $1}')
+    if [ -f "$ARG1" ]; then
+        HOST=$(grep -v "^#" $ARG1 | awk  '{ print $1}')
     else
         H=`echo $ARGHOST | tr "," " "`
         HOST=`echo $H`
@@ -279,7 +282,7 @@ do
             fi
             ;;
         -H | --hosts*)
-            if [[ "$1" =~ "--hosts" ]] ; then
+            if [[ "$1" =~ "--hosts=" ]] ; then
                 ARGHOST=$(echo $1 | awk -F= '{ print $2 }')
             else
                 ARGHOST="$2"

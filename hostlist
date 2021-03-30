@@ -1,0 +1,4 @@
+#test hostlist
+host1 group1 group2
+host2 group1 group3
+host3 group2 group4
