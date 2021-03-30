@@ -36,9 +36,14 @@ fh -H host1 -c uname -n
 fh -H host1 -c 'egrep -i "mode|currently|status|count"  /proc/net/bonding/bond*'
 
 #Remote sudo Command Test
-fh -H host1 -c sudo shutdown -h now
+fh -H host1 -c sudo whoami
 [OK] fh -H host1 -c sudo "cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`"
 [NG] fh -H host1 -c sudo cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`
+[OK] fh -H host1 -o /tmp/test.out -c sudo "cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`"
+
+[OK] fh -H host1 -c sudo "bash -c 'echo "\\# Comment" >> /etc/hosts' "
+[OK] fh -H host1 -o /tmp/test.out -c sudo "bash -c 'echo "\\# Comment" >> /etc/hosts' "
+
 
 
 #Host Test
@@ -53,12 +58,10 @@ fh -H host1 --user=xxxx -c uname -n
 
 
 
-
 #Remote File
 fh -H host1 test.sh:aaa,bbb test.sh:uname_n,ip_a
 
-fh -H host1 -s user.sh
-fh -H host1 -sc user.sh:check
-fh -H host1 -s user.sh  network.sh
+fh -H host1 -f test.sh:cmd_whoami
+fh -H host1 -f user.sh  network.sh
 fh -H host1,192.168.0.6 -s xxxx.sh
 fh -H hostlist  -s xxx.sh

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+cmd_whoami(){
+    whoami
+}
 
 uname_n(){
     uname -n

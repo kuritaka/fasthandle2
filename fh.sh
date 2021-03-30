@@ -21,6 +21,7 @@ Options:
                             comma-separated list of hosts or <HOSTLISTFILE> to operate on
     -o OUTPUTFILE, --output=OUTPUTFILE
                             Write output to bouth stdout and <OUTPUTFILE>
+    -s, --sudo              Execute command or shellscript with sudo
     -- COMMAND, -c COMMAND, --command=COMMAND
                             Execute COMMAND
     -f SHELLSCRIPT, --file=SHELLSCRIPT
@@ -30,7 +31,7 @@ Options:
     control as whom and how to connect to hosts
 
     -u USER, --user=USER    username to use when connecting to remote hosts
-    -p, -p PASSWORD, --password, --password=PASSWORD
+    -p, --password, -p PASSWORD, --password=PASSWORD
                             ssh password
                             If you do not specify a password, an input field will appear. 
     -i PRIVATEKEY           SSH private key file.
@@ -40,8 +41,11 @@ Options:
 Usage:
   Execute in Local Host:
     fh -c uname -n
-    fh -f test1.sh
-    fh -f test1.sh:arg1,arg2 test2.sh:arg1,arg2
+    fh -c whoami
+    fh -s -c whoami
+    fh -f test.sh
+    fh -f test.sh:cmd_whoami,uname_n
+    fh -f test.sh:cmd_whoami,uname_n test2.sh:arg1,arg2
     fh -o outputfile -c uname -n
 
   Execute in Remote Host:
@@ -135,6 +139,9 @@ file_parce(){
             exit 1
         fi
 
+        SHELLNAME=$(basename $F)
+        SHELLDIR=$(cd $(dirname $F); pwd)
+
         FILES=$(echo $FILES $F)
 
         #create uniq file
@@ -158,7 +165,9 @@ file_parce(){
                 for args in $(echo $ARGS)
                 do
                     #echo "for args : $args"
-                    arrays+=("$F $args")
+                    arrays+=("${SHELLDIR}/${SHELLNAME} $args")
+                    #echo "COMMAND : $F  $args"
+                    echo "COMMAND : ${SHELLDIR}/${SHELLNAME}  $args"
                 done
 
                 #ENDA=$(echo $ENDA $A)
@@ -176,7 +185,7 @@ file_parce(){
 
                 for args in $(echo $ARGS)
                 do
-                    echo "for args : $args"
+                    #echo "for args : $args"
                     SHELL=$(basename $F)
                     arrays+=("$SHELL $args")
                 done
@@ -212,6 +221,9 @@ do
         -i )
             SSHKEY="-i $2"
             shift
+            ;;
+        -s | --sudo)
+            SUDOMODE="sudo"
             ;;
         -u | --user*)
             if [[ "$1" =~ "--user" ]] ; then
@@ -344,18 +356,18 @@ fi
 if [ -z "${HOST}" ]; then
     if [ -z "${FILE}" ] ; then
         if [ -z "${OUTFILE}" ] ; then
-            bash ${BASHVERV} -c "${COMMAND}"
+            ${SUDOMODE} bash ${BASHVERV} -c "${COMMAND}"
         else
-            bash ${BASHVERV} -c "${COMMAND}" 2>&1 | tee -a "${OUTFILE}"
+            ${SUDOMODE} bash ${BASHVERV} -c "${COMMAND}" 2>&1 | tee -a "${OUTFILE}"
         fi
     else
         #Execute
         for array in "${arrays[@]}"
         do
             if [ -z "${OUTFILE}" ] ; then
-                bash ${BASHVERV} -c "${array}"
+                ${SUDOMODE} bash ${BASHVERV} -c "${array}"
             else
-                bash ${BASHVERV} -c "${array}"  2>&1 | tee -a ${OUTFILE}
+                ${SUDOMODE} bash ${BASHVERV} -c "${array}"  2>&1 | tee -a ${OUTFILE}
             fi
         done
     fi
@@ -377,10 +389,10 @@ do
 
     if [ -z "${FILE}" ] ; then
         if [ -z "${OUTFILE}" ] ; then
-            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${COMMAND}
+            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} ${COMMAND}
         else
-            echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} \"${COMMAND}\""  >>  ${OUTFILE}
-            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} "${COMMAND}" 2>&1 | tee -a  ${OUTFILE}
+            echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"${COMMAND}\""  >>  ${OUTFILE}
+            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "${COMMAND}" 2>&1 | tee -a  ${OUTFILE}
         fi
     else
         #Create Work Directory
@@ -396,10 +408,10 @@ do
         for array in "${arrays[@]}"
         do
             if [ -z "${OUTFILE}" ] ; then
-                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} bash ${BASHVERV} "${REMOTEWORK}/${array}"
+                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} -c "${REMOTEWORK}/${array}"
             else
-                echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} bash ${BASHVERV} \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
-                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
+                echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} -c \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
+                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} -c "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
             fi
         done
     fi
