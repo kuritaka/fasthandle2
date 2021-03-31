@@ -429,10 +429,10 @@ do
         for array in "${arrays[@]}"
         do
             if [ -z "${OUTFILE}" ] ; then
-                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} -c "${REMOTEWORK}/${array}"
+                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"
             else
-                echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} -c \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
-                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} -c "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
+                echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV}  \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
+                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
             fi
         done
 
