@@ -81,10 +81,10 @@ SCRIPTDIR=$(cd $(dirname $0); pwd)
 #Default parameters
 REMOTEWORK="/tmp"
 
-# /etc/fh.conf --> ${SCRIPTDIR}/fh.conf --> ~/.fh.conf
+# /etc/fh.conf --> ${SCRIPTDIR}/fh.conf --> ~/.fhrc
 [ -f "/etc/fh.conf" ] && source /etc/fh.conf
 [ -f "${SCRIPTDIR}/fh.conf" ]  && source ${SCRIPTDIR}/fh.conf
-[ -f "~/.fh.conf" ] &&  source ~/.fh.conf
+[ -f "~/.fhrc" ] &&  source ~/.fhrc
 
 
 #Function

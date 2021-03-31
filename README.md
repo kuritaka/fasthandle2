@@ -60,11 +60,11 @@ And I was improving it to make it easier to use.
 ### Configuration
 fh command work without configuration.
 
-If you want to change configuration, you can use .fh.conf of USER Home Directory or fh.conf of fh command directory or /etc/fh.conf.
+If you want to change configuration, you can use .fhrc of USER Home Directory or fh.conf of fh command directory or /etc/fh.conf.
 If there are multiple parameters, USER Home Directory's hf.conf is used.
 If there are fh.conf of fh command directory or /etc/fh.conf, fh.conf of fh command directory is used.
 
-/etc/fh.conf --> ${SCRIPTDIR}/fh.conf --> ~/.fh.conf
+/etc/fh.conf --> ${SCRIPTDIR}/fh.conf --> ~/.fhrc
 
 ```
 ~]$ cd /etc
