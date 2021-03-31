@@ -13,29 +13,29 @@ cat <<HELP
 Usage: fh  [options]
 
 Options:
-    -h, --help              show this help message and exit
-    --version               show program's version number and exit
-    -v, --verbose           verbose mode
-    -d, --debug             debug mode
+    -h, --help                  show this help message and exit
+    --version                   show program's version number and exit
+    -v, --verbose               verbose mode
+    -d, --debug                 debug mode
     -H HOST1[,HOST2], --hosts=HOST1[,HOST2], -H HOSTLISTFILE, --hosts=HOSTLISTFILE
-                            comma-separated list of hosts or <HOSTLISTFILE> to operate on
+                                comma-separated list of hosts or <HOSTLISTFILE> to operate on
     -o OUTPUTFILE, --output=OUTPUTFILE
-                            Write output to bouth stdout and <OUTPUTFILE>
-    -s, --sudo              Execute command or shellscript with sudo
+                                Write output to bouth stdout and <OUTPUTFILE>
+    -s, --sudo                  Execute command or shellscript with sudo
     -- COMMAND, -c COMMAND, --command=COMMAND
-                            Execute COMMAND
+                                Execute COMMAND
     -f SHELLSCRIPT, --file=SHELLSCRIPT
-                            Execute ShellScript
+                                Execute ShellScript
 
   Connection Options:
     control as whom and how to connect to hosts
 
-    -u USER, --user=USER    username to use when connecting to remote hosts
+    -u USER, --user=USER        username to use when connecting to remote hosts
     -p, --password, -p PASSWORD, --password=PASSWORD
-                            ssh password
-                            If you do not specify a password, an input field will appear. 
-    -i PRIVATEKEY           SSH private key file.
-    -P PORT, --port=PORT    Port to connect to on the remote host.
+                                ssh password
+                                If you do not specify a password, an input field will appear. 
+    -i PRIVATEKEY               SSH private key file.
+    -P PORT, --port=PORT        Port to connect to on the remote host.
 
 
 Usage:
