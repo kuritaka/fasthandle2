@@ -220,145 +220,165 @@ file_parce(){
 }
 
 
+option_parce(){
+    while [ "$#" -gt 0 ]
+    do
+        #echo '$1' " = $1 : ALL ARGS =  $@"
+        case $1 in
+            -h | --help)
+                usage_exit
+                exit 1
+                ;;
+            -V | --version)
+                echo $VERSION
+                exit 1
+                ;;
+            -v | --verbose)
+                VERV_FLAG="true"
+                ;;
+            -d | --debug)
+                DEBUG_FLAG="true"
+                ;;
+            -i )
+                SSHKEY="-i $2"
+                shift
+                ;;
+            -s | --sudo)
+                SUDOMODE="sudo"
+                ;;
+            -u | --user*)
+                if [[ "$1" =~ "--user" ]] ; then
+                    SSHUSER=$(echo $1 | awk -F= '{ print $2"@" }')
+                else
+                    SSHUSER="$2@"
+                    shift
+                fi
+                ;;
+            -p | --password*)
+                if [[ "$1" =~ "--password" ]] ; then
+                    if [[ "$1" =~ "--password=" ]] ; then
+                        #--password PASSWORD
+                        SSHPASS=$(echo $1 | awk -F= '{ print "sshpass -p "$2 }')
+                    else
+                        #--password only
+                        pass_parce
+                    fi
+                else
+                    if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                        #-p only
+                        pass_parce
+                    else
+                        #-p PASSWORD
+                        SSHPASS="sshpass -p $2"
+                        shift
+                    fi
+                fi
+                ;;
+            -P | --port*)
+                if [[ "$1" =~ "--port" ]] ; then
+                    SSHPORT=$(echo $1 | awk -F= '{ print $2 }')
+                else
+                    SSHPORT="$2"
+                    shift
+                fi
+                ;;
+            -H | --hosts*)
+                if [[ "$1" =~ "--hosts=" ]] ; then
+                    ARGHOST=$(echo $1 | awk -F= '{ print $2 }')
+                else
+                    ARGHOST="$2"
+                    shift
+                fi
+                host_parce
+                ;;
+            -o | --output*)
+                #echo '$2' = "$2"
+                if [[ "$1" =~ "--output" ]] ; then
+                    if [[ "$1" =~ "--output=" ]] ; then
+                        #echo "--output="
+                        OUT=$(echo $1 | awk -F= '{ print $2 }')
+                    else
+                        #echo "--output only"
+                        out_parce
+                    fi
+                else
+                    if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                        #echo "-o only"
+                        out_parce
+                    else
+                        #echo "-o $2"
+                        OUT="$2"
+                        out_parce
+                        shift
+                    fi
+                fi
+                ;;
+            -c | --command* | -- ) 
+                if [[ "$1" =~ "--command" ]] ; then
+                    COMMAND=$(echo $* | awk -F= '{ {for(i=2;i<NF;i++)printf("%s ",$i) }print($NF) }')
+                    command_parce
+                else
+                    shift
+                    COMMAND="$*"
+                    command_parce
+                fi
+                break
+                ;;
+            -f | --file* )
+                if [[ "$1" =~ "--file" ]] ; then
+                    FILE=$(echo $1 | awk -F= '{ {for(i=2;i<NF;i++)printf("%s ",$i) }print($NF) }')
+                    file_parce
+                else
+                    shift
+                    FILE="$*"
+                    #echo "FILE $FILE"
+                    file_parce
+                fi
+                break
+                ;;
+            -*) 
+                echo ""
+                echo "$0: illegal option $1"
+                echo ""
+                echo ""
+                usage_exit
+                exit 1
+                ;;
+            *)
+                echo ""
+                echo "$0: illegal option $1"
+                echo ""
+                echo ""
+                usage_exit
+                exit 1
+                ;;
+        esac
+        shift
+done
+}
 
+#Option Sort
 while [ "$#" -gt 0 ]
 do
     #echo '$1' " = $1 : ALL ARGS =  $@"
     case $1 in
-        -h | --help)
-            usage_exit
-            exit 1
-            ;;
-        -V | --version)
-            echo $VERSION
-            exit 1
-            ;;
-        -v | --verbose)
-            VERV_FLAG="true"
-            ;;
-        -d | --debug)
-            DEBUG_FLAG="true"
-            ;;
-        -i )
-            SSHKEY="-i $2"
-            shift
-            ;;
-        -s | --sudo)
-            SUDOMODE="sudo"
-            ;;
-        -u | --user*)
-            if [[ "$1" =~ "--user" ]] ; then
-                SSHUSER=$(echo $1 | awk -F= '{ print $2"@" }')
-            else
-                SSHUSER="$2@"
-                shift
-            fi
-            ;;
-        -p | --password*)
-            if [[ "$1" =~ "--password" ]] ; then
-                if [[ "$1" =~ "--password=" ]] ; then
-                    #--password PASSWORD
-                    SSHPASS=$(echo $1 | awk -F= '{ print "sshpass -p "$2 }')
-                else
-                    #--password only
-                    pass_parce
-                fi
-            else
-                if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-                    #-p only
-                    pass_parce
-                else
-                    #-p PASSWORD
-                    SSHPASS="sshpass -p $2"
-                    shift
-                fi
-            fi
-            ;;
-        -P | --port*)
-            if [[ "$1" =~ "--port" ]] ; then
-                SSHPORT=$(echo $1 | awk -F= '{ print $2 }')
-            else
-                SSHPORT="$2"
-                shift
-            fi
-            ;;
         -H | --hosts*)
             if [[ "$1" =~ "--hosts=" ]] ; then
-                ARGHOST=$(echo $1 | awk -F= '{ print $2 }')
+                OPTION1+=" $1 "
             else
-                ARGHOST="$2"
-            fi
-            host_parce
-            shift
-            ;;
-        -o | --output*)
-            #echo '$2' = "$2"
-            if [[ "$1" =~ "--output" ]] ; then
-                if [[ "$1" =~ "--output=" ]] ; then
-                    #echo "--output="
-                    OUT=$(echo $1 | awk -F= '{ print $2 }')
-                else
-                    #echo "--output only"
-                    out_parce
-                fi
-            else
-                if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-                    #echo "-o only"
-                    out_parce
-                else
-                    #echo "-o $2"
-                    OUT="$2"
-                    out_parce
-                    shift
-                fi
-            fi
-            ;;
-        -c | --command* | -- ) 
-            if [[ "$1" =~ "--command" ]] ; then
-                COMMAND=$(echo $* | awk -F= '{ {for(i=2;i<NF;i++)printf("%s ",$i) }print($NF) }')
-                command_parce
-            else
+                OPTION1+=" $1  $2 "
                 shift
-                COMMAND="$*"
-                command_parce
             fi
-            break
-            ;;
-        -f | --file* )
-            if [[ "$1" =~ "--file" ]] ; then
-                FILE=$(echo $1 | awk -F= '{ {for(i=2;i<NF;i++)printf("%s ",$i) }print($NF) }')
-                file_parce
-            else
-                shift
-                FILE="$*"
-                #echo "FILE $FILE"
-                file_parce
-            fi
-            break
-            ;;
-        -*) 
-            echo ""
-            echo "$0: illegal option $1"
-            echo ""
-            echo ""
-            usage_exit
-            exit 1
             ;;
         *)
-            echo ""
-            echo "$0: illegal option $1"
-            echo ""
-            echo ""
-            usage_exit
-            exit 1
+            OPTION2+=" $1 "
             ;;
     esac
     shift
 done
 
-#Check Only Parameter
-#echo $SSHUSER
-#exit
+OPTION="$OPTION1 $OPTION2"
+option_parce $OPTION
 
 
 echo ""
@@ -372,6 +392,8 @@ else
     SSHVERV="-q"
     BASHVERV=""
 fi
+
+
 
 #Execute in Local Host
 if [ -z "${HOST}" ]; then
