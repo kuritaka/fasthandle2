@@ -89,8 +89,9 @@ REMOTEWORK="/tmp"
 
 #Function
 host_parce(){
+    #hostlist:arg1,arg2
     ARG1=$(echo $ARGHOST |awk  -F: '{ print $1}')
-    GROUP=$(echo $ARGHOST |awk  -F: '{ print $2}')
+    GROUP=$(echo $ARGHOST |awk  -F: '{ print $2}' |sed -e 's/,/|/g' )
 
     #Check File
     if [ -f "$ARG1" ]; then
