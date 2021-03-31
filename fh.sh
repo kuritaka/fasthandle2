@@ -42,7 +42,7 @@ Usage:
   Execute Commnad in Local Host:
     fh -c uname -n
     fh -c 'uname -n; whoami'
-    fh -c 'echo $(uname -n)-------; whoami'
+    fh -c 'echo \$(uname -n)-------; whoami'
     fh -c whoami
     fh -c 'sudo whoami'
     fh -s -c whoami
@@ -60,8 +60,8 @@ Usage:
     fh -H host1 -c 'uname -n; whoami'
     fh -H host1 -c 'sudo uname -n; sudo whoami'
     fh -H host1 -s -c 'uname -n; whoami'
-    fh -H host1 -c 'echo $(uname -n)--------; whoami'
-    fh -H host1 -s -c 'echo $(uname -n)--------; whoami'
+    fh -H host1 -c 'echo \$(uname -n)--------; whoami'
+    fh -H host1 -s -c 'echo \$(uname -n)--------; whoami'
     fh -H host1,host2 -c uname -n
     fh -H host1,host2 -s -c uname -n
 
@@ -434,6 +434,13 @@ do
                 echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} -c \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
                 ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} -c "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
             fi
+        done
+
+        #Delete file
+        for i in ${FILE_UNIQ}
+        do
+            #${SSHPASS} ssh -n ${SSHKEY} ${SSHUSER}${H} ls -l ${REMOTEWORK}/$i
+            ${SSHPASS} ssh -n ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i
         done
     fi
 
