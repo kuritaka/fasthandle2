@@ -33,6 +33,7 @@ fh -s ../script/test.sh:uname_n,ip_a ../script/test.sh:uname_n
 #############################################
 #Execute Command
 fh -H host1 -c uname -n
+fh -c uname -n -H host1
 fh -H host1 -c whoami
 fh -H host1 -c sudo whoami
 fh -H host1 -s -c whoami
