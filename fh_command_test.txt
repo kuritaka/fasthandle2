@@ -41,6 +41,7 @@ fh -H host1 -s -c "uname -n; uname -n"
 fh -H host1 -c 'sudo uname -n; sudo whoami'
 [OK] fh -H host1 -s -c "uname -n; whoami"
 [NG] fh -H host1 -s -c 'bash -c "uname -n; whoami"
+[OK] fh -H host1 -s -c 'cat /etc/ssh/sshd_config |egrep "PermitRootLogin|PasswordAuthentication"'
 fh -H host1 -c 'egrep -i "mode|currently|status|count"  /proc/net/bonding/bond*'
 fh -H hostlist  -c "uname -n"
 fh -H hostlist:group2,group4  -c "uname -n"

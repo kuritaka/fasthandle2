@@ -142,10 +142,10 @@ out_parce(){
 
 command_parce(){
     #echo "COMMAND before = $COMMAND"
-
-    COMMAND=`echo $COMMAND`
-
     echo "COMMAND = $COMMAND"
+
+    COMMAND=$(echo $COMMAND | sed 's/"/\\"/g')
+
 }
 
 file_parce(){
