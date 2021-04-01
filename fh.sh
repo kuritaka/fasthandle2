@@ -26,6 +26,7 @@ Options:
                                 Execute COMMAND
     -f SHELLSCRIPT, --file=SHELLSCRIPT
                                 Execute ShellScript
+    --login                     login remote host
 
   Connection Options:
     control as whom and how to connect to hosts
@@ -54,6 +55,7 @@ Usage:
     fh -o outputfile -c uname -n
 
   Execute ShellScript in Remote Host:
+    fh -H host1 --login
     fh -H host1 -c uname -n
     fh -H host1 -s -c whoami
     fh -H host1 -c sudo whoami
@@ -336,6 +338,9 @@ option_parce(){
                 fi
                 break
                 ;;
+            --login)
+                LOGIN_FLAG="true"
+                ;;
             -*) 
                 echo ""
                 echo "$0: illegal option $1"
@@ -429,8 +434,9 @@ do
         break
     fi
 
-
-    if [ -z "${FILE}" ] ; then
+    if [ "$LOGIN_FLAG" == "true" ] ; then
+        ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
+    elif [ -z "${FILE}" ] ; then
         if [ -z "${OUTFILE}" ] ; then
             ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
         else
