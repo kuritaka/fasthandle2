@@ -47,14 +47,16 @@ fh -H host1 -c 'egrep -i "mode|currently|status|count"  /proc/net/bonding/bond*'
 fh -H hostlist  -c "uname -n"
 fh -H hostlist:group2,group4  -c "uname -n"
 
-#Remote sudo Command Test
+#sudo Command Test
 fh -H host1 -c sudo whoami
 [OK] fh -H host1 -c sudo "cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`"
 [OK] fh -H host1 -c sudo cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`
 [OK] fh -H host1 -o /tmp/test.out -c sudo "cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`"
 
+[OK] fh -H host1 -s -c 'echo "# Comment" >> /etc/hosts'
+[NG] fh -H host1 -c sudo 'echo "\\# Comment" >> /etc/hosts'
 [OK] fh -H host1 -c sudo "bash -c 'echo "\\# Comment" >> /etc/hosts' "
-[OK] fh -H host1 -o /tmp/test.out -c sudo "bash -c 'echo "\\# Comment" >> /etc/hosts' "
+[OK] fh -H host1 -o /tmp/test.out -c sudo "bash -c 'echo "\\# Comment 2021-04-02" >> /etc/hosts' "
 
 
 
