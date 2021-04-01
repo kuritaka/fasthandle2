@@ -84,42 +84,65 @@ $ fh -h
 Usage: fh  [options]
 
 Options:
-    -h, --help              show this help message and exit
-    --version               show program's version number and exit
-    -v, --verbose           verbose mode
-    -d, --debug             debug mode
+    -h, --help                  show this help message and exit
+    --version                   show program's version number and exit
+    -v, --verbose               verbose mode
+    -d, --debug                 debug mode
     -H HOST1[,HOST2], --hosts=HOST1[,HOST2], -H HOSTLISTFILE, --hosts=HOSTLISTFILE
-                            comma-separated list of hosts or <HOSTLISTFILE> to operate on
+                                comma-separated list of hosts or <HOSTLISTFILE> to operate on
     -o OUTPUTFILE, --output=OUTPUTFILE
-                            Write output to bouth stdout and <OUTPUTFILE>
+                                Write output to bouth stdout and <OUTPUTFILE>
+    -s, --sudo                  Execute command or shellscript with sudo
     -- COMMAND, -c COMMAND, --command=COMMAND
-                            Execute COMMAND
+                                Execute COMMAND
     -f SHELLSCRIPT, --file=SHELLSCRIPT
-                            Execute ShellScript
+                                Execute ShellScript
+    --login                     login remote host
 
   Connection Options:
     control as whom and how to connect to hosts
 
-    -u USER, --user=USER    username to use when connecting to remote hosts
-    -p, -p PASSWORD, --password, --password=PASSWORD
-                            ssh password
-                            If you do not specify a password, an input field will appear. 
-    -i PRIVATEKEY           SSH private key file.
-    -P PORT, --port=PORT    Port to connect to on the remote host.
+    -u USER, --user=USER        username to use when connecting to remote hosts
+    -p, --password, -p PASSWORD, --password=PASSWORD
+                                ssh password
+                                If you do not specify a password, an input field will appear. 
+    -i PRIVATEKEY               SSH private key file.
+    -P PORT, --port=PORT        Port to connect to on the remote host.
 
 
 Usage:
-  Execute in Local Host:
+  Execute Commnad in Local Host:
     fh -c uname -n
-    fh -f test1.sh
-    fh -f test1.sh:arg1,arg2 test2.sh:arg1,arg2
+    fh -c 'uname -n; whoami'
+    fh -c 'echo \$(uname -n)-------; whoami'
+    fh -c whoami
+    fh -c 'sudo whoami'
+    fh -s -c whoami
+
+  Execute ShellScript in Local Host:
+    fh -f test.sh
+    fh -f test.sh:cmd_whoami,uname_n
+    fh -f test.sh:cmd_whoami,uname_n test2.sh:arg1,arg2
     fh -o outputfile -c uname -n
 
-  Execute in Remote Host:
+  Execute ShellScript in Remote Host:
+    fh -H host1 --login
     fh -H host1 -c uname -n
+    fh -H host1 -s -c whoami
+    fh -H host1 -c sudo whoami
+    fh -H host1 -c 'uname -n; whoami'
+    fh -H host1 -c 'sudo uname -n; sudo whoami'
+    fh -H host1 -s -c 'uname -n; whoami'
+    fh -H host1 -c 'echo \$(uname -n)--------; whoami'
+    fh -H host1 -s -c 'echo \$(uname -n)--------; whoami'
     fh -H host1,host2 -c uname -n
-    fh -H host1,host2 -f test1.sh
-    fh -H hostlist -f test1.sh
+    fh -H host1,host2 -s -c uname -n
+
+  Execute Command in Remote Host:
+    fh -H host1 -f test.sh:cmd_whoami
+    fh -H host1 -s -f test.sh:cmd_whoami
+    fh -H host1,host2 -f test.sh
+    fh -H hostlist -f test.sh:cmd_whoami
     fh -H host1 -o outputfile -c uname -n
 ```
 
