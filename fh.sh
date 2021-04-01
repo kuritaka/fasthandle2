@@ -438,14 +438,14 @@ do
         ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
     elif [ -z "${FILE}" ] ; then
         if [ -z "${OUTFILE}" ] ; then
-            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
+            ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
         else
-            echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\" \" "  >>  ${OUTFILE}
-            ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\"" 2>&1 | tee -a  ${OUTFILE}
+            echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\" \" "  >>  ${OUTFILE}
+            ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\"" 2>&1 | tee -a  ${OUTFILE}
         fi
     else
         #Create Work Directory
-        ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
+        ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
 
         #SCP
         for i in ${FILE_UNIQ}
@@ -457,18 +457,18 @@ do
         for array in "${arrays[@]}"
         do
             if [ -z "${OUTFILE}" ] ; then
-                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"
+                ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"
             else
-                echo "$ ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV}  \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
-                ${SSHPASS} ssh -n ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
+                echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV}  \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
+                ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
             fi
         done
 
         #Delete file
         for i in ${FILE_UNIQ}
         do
-            #${SSHPASS} ssh -n ${SSHKEY} ${SSHUSER}${H} ls -l ${REMOTEWORK}/$i
-            ${SSHPASS} ssh -n ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i
+            #${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H} ls -l ${REMOTEWORK}/$i
+            ${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i
         done
     fi
 
