@@ -88,3 +88,5 @@ fh -H host1 --vi /etc/hosts
 fh -H host1 --vi=/etc/hosts
 
 fh -H host1 --scp FILE /tmp
+
+fh -H host1,hosta,hostb --ping

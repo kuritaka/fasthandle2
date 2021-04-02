@@ -6,7 +6,7 @@
 # Refarence:
 # https://github.com/kuritaka/fasthandle2
 #
-VERSION="2.0.0 beta"
+VERSION="2.2021.04.02a Beta"
 
 usage_exit() {
 cat <<HELP
@@ -26,6 +26,7 @@ Options:
                                 Execute COMMAND
     -f SHELLSCRIPT, --file=SHELLSCRIPT, -f SHELLSCRIPT1 SHELLSCRIPT2
                                 Execute ShellScript
+    --ping                      check ping test
     --login                     login remote host
     --vi FILE, --vi=FILE        edit the remote file
     --scp LOCLA_FILE REMOTE_DIR
@@ -77,6 +78,7 @@ Usage:
     fh -H host1 -o outputfile -c uname -n
 
   Others
+    fh -H host1 --ping
     fh -H host1 --login
     fh -H host1 --vi FILE
     fh -H host1 -s --vi FILE   #-s = with sudo
@@ -346,6 +348,9 @@ option_parce(){
                 fi
                 break
                 ;;
+            --ping)
+                PING_FLAG="true"
+                ;;
             --login | --ssh)
                 LOGIN_FLAG="true"
                 ;;
@@ -452,56 +457,65 @@ fi
 #Execute in Remote Host
 for H in ${HOST}
 do
-    echo ""
-    echo "Host : ${H}"
 
-    ping -c 1 ${H} > /dev/null
-    if [ "$?" -ne 0 ] ; then
-        echo "[Critical Message] Connection Error Host $H"
-        break
-    fi
-
-    if [ "$LOGIN_FLAG" == "true" ] ; then
-        ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
-    elif [ "$VI_FLAG" == "true" ] ; then
-        ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}
-    elif [ "$SCP_FLAG" == "true" ] ; then
-        echo "${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
-        ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}
-    elif [ -z "${FILE}" ] ; then
-        if [ -z "${OUTFILE}" ] ; then
-            ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
+    if [ "$PING_FLAG" == "true" ] ; then
+        ping -W 1 -c 1 ${H} > /dev/null
+        if [ "$?" -eq 0 ] ; then
+            echo "ping OK ${H} "
         else
-            echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\" \" "  >>  ${OUTFILE}
-            ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\"" 2>&1 | tee -a  ${OUTFILE}
+            echo "ping NG ${H}"
         fi
     else
-        #Create Work Directory
-        ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
-
-        #SCP
-        for i in ${FILE_UNIQ}
-        do
-            ${SSHPASS} scp ${SSHKEY} ${SSHVERV} $i ${SSHUSER}${H}:${REMOTEWORK}
-        done
-
-        #Execute
-        for array in "${arrays[@]}"
-        do
+        echo ""
+        echo "Host : ${H}"
+    
+        ping -W 1 -c 1 ${H} > /dev/null
+        if [ "$?" -ne 0 ] ; then
+            echo "[Critical Message] Connection Error Host $H"
+            break
+        fi
+    
+        if [ "$LOGIN_FLAG" == "true" ] ; then
+            ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
+        elif [ "$VI_FLAG" == "true" ] ; then
+            ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}
+        elif [ "$SCP_FLAG" == "true" ] ; then
+            echo "${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
+            ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}
+        elif [ -z "${FILE}" ] ; then
             if [ -z "${OUTFILE}" ] ; then
-                ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"
+                ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
             else
-                echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV}  \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
-                ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
+                echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\" \" "  >>  ${OUTFILE}
+                ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\"" 2>&1 | tee -a  ${OUTFILE}
             fi
-        done
-
-        #Delete file
-        for i in ${FILE_UNIQ}
-        do
-            #${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H} ls -l ${REMOTEWORK}/$i
-            ${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i
-        done
+        else
+            #Create Work Directory
+            ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
+    
+            #SCP
+            for i in ${FILE_UNIQ}
+            do
+                ${SSHPASS} scp ${SSHKEY} ${SSHVERV} $i ${SSHUSER}${H}:${REMOTEWORK}
+            done
+    
+            #Execute
+            for array in "${arrays[@]}"
+            do
+                if [ -z "${OUTFILE}" ] ; then
+                    ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"
+                else
+                    echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV}  \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
+                    ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
+                fi
+            done
+    
+            #Delete file
+            for i in ${FILE_UNIQ}
+            do
+                #${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H} ls -l ${REMOTEWORK}/$i
+                ${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i
+            done
+        fi
     fi
-
 done
