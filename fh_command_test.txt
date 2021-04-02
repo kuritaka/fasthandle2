@@ -69,7 +69,7 @@ fh -H host1 --user=xxxx -c uname -n
 #Password
 
 
-#Remote File
+#Execute Remote File
 fh -H host1 -f test1.sh:uname_n
 fh -H host1 -f test1.sh:uname_n,cmd_whoami
 fh -H host1 -s -f test1.sh:uname_n,cmd_whoami
@@ -78,3 +78,10 @@ fh -H host1 -f test1.sh:uname_n,cmd_whoami test2.sh:uname_n,ip_a
 fh -H host1 -f user.sh  network.sh
 fh -H host1,192.168.0.6 -s xxxx.sh
 fh -H hostlist -s -f xxx.sh
+
+
+#Others
+fh -H host1 --login
+fh -H host1 --ssh
+fh -H host1 --vi /etc/hosts
+fh -H host1 --vi=/etc/hosts

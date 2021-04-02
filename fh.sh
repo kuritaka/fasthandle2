@@ -24,9 +24,10 @@ Options:
     -s, --sudo                  Execute command or shellscript with sudo
     -- COMMAND, -c COMMAND, --command=COMMAND
                                 Execute COMMAND
-    -f SHELLSCRIPT, --file=SHELLSCRIPT
+    -f SHELLSCRIPT, --file=SHELLSCRIPT, -f SHELLSCRIPT1 SHELLSCRIPT2
                                 Execute ShellScript
     --login                     login remote host
+    --vi FILE, --vi=FILE        edit the remote file
 
   Connection Options:
     control as whom and how to connect to hosts
@@ -54,8 +55,7 @@ Usage:
     fh -f test.sh:cmd_whoami,uname_n test2.sh:arg1,arg2
     fh -o outputfile -c uname -n
 
-  Execute ShellScript in Remote Host:
-    fh -H host1 --login
+  Execute Command in Remote Host:
     fh -H host1 -c uname -n
     fh -H host1 -s -c whoami
     fh -H host1 -c sudo whoami
@@ -67,12 +67,17 @@ Usage:
     fh -H host1,host2 -c uname -n
     fh -H host1,host2 -s -c uname -n
 
-  Execute Command in Remote Host:
+  Execute ShellScript in Remote Host:
     fh -H host1 -f test.sh:cmd_whoami
     fh -H host1 -s -f test.sh:cmd_whoami
     fh -H host1,host2 -f test.sh
     fh -H hostlist -f test.sh:cmd_whoami
     fh -H host1 -o outputfile -c uname -n
+
+  Others
+    fh -H host1 --login
+    fh -H host1 --vi FILE
+    fh -H host1 -s --vi FILE   #-s = with sudo
 HELP
 }
 #=============================================================
@@ -277,7 +282,7 @@ option_parce(){
                 fi
                 ;;
             -P | --port*)
-                if [[ "$1" =~ "--port" ]] ; then
+                if [[ "$1" =~ "--port=" ]] ; then
                     SSHPORT=$(echo $1 | awk -F= '{ print $2 }')
                 else
                     SSHPORT="$2"
@@ -316,7 +321,7 @@ option_parce(){
                 fi
                 ;;
             -c | --command* | -- ) 
-                if [[ "$1" =~ "--command" ]] ; then
+                if [[ "$1" =~ "--command=" ]] ; then
                     COMMAND=$(echo $* | awk -F= '{ {for(i=2;i<NF;i++)printf("%s ",$i) }print($NF) }')
                     command_parce
                 else
@@ -327,7 +332,7 @@ option_parce(){
                 break
                 ;;
             -f | --file* )
-                if [[ "$1" =~ "--file" ]] ; then
+                if [[ "$1" =~ "--file=" ]] ; then
                     FILE=$(echo $1 | awk -F= '{ {for(i=2;i<NF;i++)printf("%s ",$i) }print($NF) }')
                     file_parce
                 else
@@ -338,8 +343,19 @@ option_parce(){
                 fi
                 break
                 ;;
-            --login)
+            --login | --ssh)
                 LOGIN_FLAG="true"
+                ;;
+            --vi*)
+                VI_FLAG="true"
+                if [[ "$1" =~ "--vi=" ]] ; then
+                    #--vi=FILE
+                    REMOTEFILE=$(echo $1 | awk -F= '{ print $2 }')
+                else
+                    #--vi FILE
+                    REMOTEFILE="$2"
+                    shift
+                fi
                 ;;
             -*) 
                 echo ""
@@ -436,6 +452,8 @@ do
 
     if [ "$LOGIN_FLAG" == "true" ] ; then
         ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
+    elif [ "$VI_FLAG" == "true" ] ; then
+        ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}
     elif [ -z "${FILE}" ] ; then
         if [ -z "${OUTFILE}" ] ; then
             ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
