@@ -28,6 +28,8 @@ Options:
                                 Execute ShellScript
     --login                     login remote host
     --vi FILE, --vi=FILE        edit the remote file
+    --scp LOCLA_FILE REMOTE_DIR
+                                transport file with scp
 
   Connection Options:
     control as whom and how to connect to hosts
@@ -78,6 +80,7 @@ Usage:
     fh -H host1 --login
     fh -H host1 --vi FILE
     fh -H host1 -s --vi FILE   #-s = with sudo
+    fh -H host1 --scp LOCAL_FILE  REMOTEDIR
 HELP
 }
 #=============================================================
@@ -357,6 +360,14 @@ option_parce(){
                     shift
                 fi
                 ;;
+            --scp)
+                SCP_FLAG="true"
+                #--scp LOCAL_FILE REMOTE_DIR
+                SCP_LOCAL_FILE="$2"
+                SCP_REMOTE_DIR="$3"
+                shift
+                shift
+                ;;
             -*) 
                 echo ""
                 echo "$0: illegal option $1"
@@ -454,6 +465,9 @@ do
         ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
     elif [ "$VI_FLAG" == "true" ] ; then
         ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}
+    elif [ "$SCP_FLAG" == "true" ] ; then
+        echo "${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
+        ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}
     elif [ -z "${FILE}" ] ; then
         if [ -z "${OUTFILE}" ] ; then
             ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""

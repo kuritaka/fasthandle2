@@ -83,5 +83,8 @@ fh -H hostlist -s -f xxx.sh
 #Others
 fh -H host1 --login
 fh -H host1 --ssh
+
 fh -H host1 --vi /etc/hosts
 fh -H host1 --vi=/etc/hosts
+
+fh -H host1 --scp FILE /tmp
