@@ -420,9 +420,11 @@ option_parce $OPTION
 
 echo ""
 if [ "$VERV_FLAG" == "true" ] ; then
+    ECHO="on"
     SSHVERV=""
     BASHVERV=""
 elif [ "$DEBUG_FLAG" == "true" ] ; then
+    ECHO="on"
     SSHVERV="-v"
     BASHVERV="-x"
 else
@@ -435,19 +437,24 @@ fi
 #Execute in Local Host
 if [ -z "${HOST}" ]; then
     if [ -z "${FILE}" ] ; then
+        #Execute Command
         if [ -z "${OUTFILE}" ] ; then
+            [ "$ECHO" == "on" ] && echo "Execute : ${SUDOMODE} bash ${BASHVERV} -c \"${COMMAND}\""
             ${SUDOMODE} bash ${BASHVERV} -c "${COMMAND}"
         else
+            [ "$ECHO" == "on" ] && echo "Execute : ${SUDOMODE} bash ${BASHVERV} -c \"${COMMAND}\" 2>&1 | tee -a \"${OUTFILE}\""
             ${SUDOMODE} bash ${BASHVERV} -c "${COMMAND}" 2>&1 | tee -a "${OUTFILE}"
         fi
     else
-        #Execute
+        #Execute Shell
         for array in "${arrays[@]}"
         do
             if [ -z "${OUTFILE}" ] ; then
-                ${SUDOMODE} bash ${BASHVERV} -c "${array}"
+                [ "$ECHO" == "on" ] && echo "Execute : ${SUDOMODE} bash ${BASHVERV} ${array}"
+                ${SUDOMODE} bash ${BASHVERV} ${array}
             else
-                ${SUDOMODE} bash ${BASHVERV} -c "${array}"  2>&1 | tee -a ${OUTFILE}
+                [ "$ECHO" == "on" ] && echo "Execute : ${SUDOMODE} bash ${BASHVERV} ${array}  2>&1 | tee -a ${OUTFILE}"
+                ${SUDOMODE} bash ${BASHVERV} ${array}  2>&1 | tee -a ${OUTFILE}
             fi
         done
     fi
@@ -476,43 +483,63 @@ do
         fi
     
         if [ "$LOGIN_FLAG" == "true" ] ; then
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}"
             ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
+            [ "$ECHO" == "on" ] && echo  ""
         elif [ "$VI_FLAG" == "true" ] ; then
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
             ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}
+            [ "$ECHO" == "on" ] && echo  ""
         elif [ "$SCP_FLAG" == "true" ] ; then
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
             echo "${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
             ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}
+            [ "$ECHO" == "on" ] && echo  ""
         elif [ -z "${FILE}" ] ; then
+            #Execute Command
             if [ -z "${OUTFILE}" ] ; then
+                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\"\""
                 ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
+                [ "$ECHO" == "on" ] && echo  ""
             else
+                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\"\" 2>&1 | tee -a  ${OUTFILE}"
                 echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\" \" "  >>  ${OUTFILE}
                 ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\"" 2>&1 | tee -a  ${OUTFILE}
+                [ "$ECHO" == "on" ] && echo  ""
             fi
         else
             #Create Work Directory
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} \"[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}\""
             ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
+            [ "$ECHO" == "on" ] && echo  ""
     
             #SCP
             for i in ${FILE_UNIQ}
             do
+                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} scp ${SSHKEY} ${SSHVERV} $i ${SSHUSER}${H}:${REMOTEWORK}"
                 ${SSHPASS} scp ${SSHKEY} ${SSHVERV} $i ${SSHUSER}${H}:${REMOTEWORK}
+                [ "$ECHO" == "on" ] && echo  ""
             done
     
             #Execute
             for array in "${arrays[@]}"
             do
                 if [ -z "${OUTFILE}" ] ; then
+                    [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} \"${REMOTEWORK}/${array}\" "
                     ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"
+                    [ "$ECHO" == "on" ] && echo  ""
                 else
+                    [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} \"${REMOTEWORK}/${array}\"  2>&1 | tee -a ${OUTFILE}"
                     echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV}  \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
                     ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
+                    [ "$ECHO" == "on" ] && echo  ""
                 fi
             done
     
             #Delete file
             for i in ${FILE_UNIQ}
             do
+                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i "
                 #${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H} ls -l ${REMOTEWORK}/$i
                 ${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i
             done

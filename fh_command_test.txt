@@ -52,6 +52,9 @@ fh -H host1 -c sudo whoami
 [OK] fh -H host1 -c sudo cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`
 [OK] fh -H host1 -o /tmp/test.out -c sudo "cp -p /etc/hosts /etc/hosts.`date '+%Y%m%d'`"
 
+[OK] fh -H host1 -s -c 'echo "x.x.x.x   test-server1" >> /etc/hosts'
+[OK] fh -H host1 -s -c "echo \"x.x.x.x   test-server1\" >> /etc/hosts"
+
 [OK] fh -H host1 -s -c 'echo "# Comment" >> /etc/hosts'
 [NG] fh -H host1 -c sudo 'echo "\\# Comment" >> /etc/hosts'
 [OK] fh -H host1 -c sudo "bash -c 'echo "\\# Comment" >> /etc/hosts' "

@@ -1,13 +1,16 @@
 #!/bin/sh
 
+#fh -H host1 -f test1.sh:cmd_whoami
 cmd_whoami(){
     whoami
 }
 
+#fh -H host1 -f test1.sh:uname_n
 uname_n(){
     uname -n
 }
 
+#fh -H host1 -f test1.sh:ip_a
 ip_a(){
     ip a
 }
