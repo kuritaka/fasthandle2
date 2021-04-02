@@ -95,9 +95,13 @@ Options:
     -s, --sudo                  Execute command or shellscript with sudo
     -- COMMAND, -c COMMAND, --command=COMMAND
                                 Execute COMMAND
-    -f SHELLSCRIPT, --file=SHELLSCRIPT
+    -f SHELLSCRIPT, --file=SHELLSCRIPT, -f SHELLSCRIPT1 SHELLSCRIPT2
                                 Execute ShellScript
+    --ping                      check ping test
     --login                     login remote host
+    --vi FILE, --vi=FILE        edit the remote file
+    --scp LOCLA_FILE REMOTE_DIR
+                                transport file with scp
 
   Connection Options:
     control as whom and how to connect to hosts
@@ -125,8 +129,7 @@ Usage:
     fh -f test.sh:cmd_whoami,uname_n test2.sh:arg1,arg2
     fh -o outputfile -c uname -n
 
-  Execute ShellScript in Remote Host:
-    fh -H host1 --login
+  Execute Command in Remote Host:
     fh -H host1 -c uname -n
     fh -H host1 -s -c whoami
     fh -H host1 -c sudo whoami
@@ -138,12 +141,19 @@ Usage:
     fh -H host1,host2 -c uname -n
     fh -H host1,host2 -s -c uname -n
 
-  Execute Command in Remote Host:
+  Execute ShellScript in Remote Host:
     fh -H host1 -f test.sh:cmd_whoami
     fh -H host1 -s -f test.sh:cmd_whoami
     fh -H host1,host2 -f test.sh
     fh -H hostlist -f test.sh:cmd_whoami
     fh -H host1 -o outputfile -c uname -n
+
+  Others
+    fh -H host1 --ping
+    fh -H host1 --login
+    fh -H host1 --vi FILE
+    fh -H host1 -s --vi FILE   #-s = with sudo
+    fh -H host1 --scp LOCAL_FILE  REMOTEDIR
 ```
 
 
