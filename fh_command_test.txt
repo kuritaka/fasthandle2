@@ -6,7 +6,6 @@
 export PATH="$PATH:`pwd`:."
 alias fh=fh.sh
 
-
 #############################################
 # TEST(1) Not Need Host
 #############################################
@@ -59,7 +58,6 @@ fh -H host1 -c sudo whoami
 [OK] fh -H host1 -o /tmp/test.out -c sudo "bash -c 'echo "\\# Comment 2021-04-02" >> /etc/hosts' "
 
 
-
 #Host Test
 fh -H host1,host2 -c uname -n
 fh -H hostlist -c uname -n
@@ -71,11 +69,12 @@ fh -H host1 --user=xxxx -c uname -n
 #Password
 
 
-
 #Remote File
-fh -H host1 test.sh:aaa,bbb test.sh:uname_n,ip_a
+fh -H host1 -f test1.sh:uname_n
+fh -H host1 -f test1.sh:uname_n,cmd_whoami
+fh -H host1 -s -f test1.sh:uname_n,cmd_whoami
+fh -H host1 -f test1.sh:uname_n,cmd_whoami test2.sh:uname_n,ip_a
 
-fh -H host1 -f test.sh:cmd_whoami
 fh -H host1 -f user.sh  network.sh
 fh -H host1,192.168.0.6 -s xxxx.sh
-fh -H hostlist  -s xxx.sh
+fh -H hostlist -s -f xxx.sh

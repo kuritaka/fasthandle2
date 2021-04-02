@@ -12,6 +12,7 @@ ip_a(){
     ip a
 }
 
+
 #FastHandle Function
 if [ "$#" -ne 0 ]; then
     for ARG in "$@"
