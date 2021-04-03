@@ -1,31 +1,47 @@
 #!/bin/sh
+#fh -H host1 -f test1.sh:argall
 
-#fh -H host1 -f test2.sh:cmd_whoami
-cmd_whoami(){
+
+#fh -H host1 -f test1.sh:cmd_whoami
+cmd_whoami (){
     whoami
 }
 
-#fh -H host1 -f test2.sh:uname_n
-uname_n(){
+#fh -H host1 -f test1.sh:uname_n
+uname_n (){
     uname -n
 }
 
-
-#fh -H host1 -f test2.sh:ip_a
-ip_a(){
+#fh -H host1 -f test1.sh:ip_a
+ip_a (){
     ip a
 }
 
 
+
+#==============================================
 #FastHandle Function
-if [ "$#" -ne 0 ]; then
-    for ARG in "$@"
+#==============================================
+#execute all function
+execute_all (){
+    ALL_FUNCTION=$(cat $0 |grep -e "(\s*)\s*{" |egrep -v "execute_all|ALL_FUNCTION" |awk -F\( '{ print $1 }')
+    for ARG in $(echo $ALL_FUNCTION)
     do
         $ARG
+    done    
+}
+
+if [ "$#" -ne 0 ] ; then
+    for ARG in "$@"
+    do
+        if [ "$ARG" == "argall" ] ; then
+            #execute all function
+            execute_all
+        else
+            $ARG
+        fi
     done
 else
     #execute all function
-    ALL_FUNCTION=$(cat $0 |grep "()" |grep -v "ALL_FUNCTION" |awk -F\( '{ print $1 }')
-    $ALL_FUNCTION
+    execute_all
 fi
-
