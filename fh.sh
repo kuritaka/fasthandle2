@@ -95,10 +95,16 @@ SCRIPTDIR=$(cd $(dirname $0); pwd)
 #Default parameters
 REMOTEWORK="/tmp"
 
-# /etc/fh.conf --> ${SCRIPTDIR}/fh.conf --> ~/.fhrc
+# /etc/fh.conf --> ${SCRIPTDIR}/fh.conf --> ${HOME}/fh.conf --> ${HOME}/.fhrc
 [ -f "/etc/fh.conf" ] && source /etc/fh.conf
 [ -f "${SCRIPTDIR}/fh.conf" ]  && source ${SCRIPTDIR}/fh.conf
-[ -f "~/.fhrc" ] &&  source ~/.fhrc
+[ -f "${HOME}/fh.conf" ] &&  source ${HOME}/fh.conf
+[ -f "${HOME}/.fhrc" ] &&  source ${HOME}/.fhrc
+
+[ ! -z ${SSHUSER} ] && USERAT="${SSHUSER}@"
+[ ! -z ${SSHPASS} ] && SSHPASSP="sshpass -p ${SSHPASS}"
+[ ! -z ${SSHKEY} ] && SSHKEY="-i ${SSHKEY}"
+
 
 
 #Function
@@ -121,7 +127,7 @@ host_parce(){
 pass_parce(){
     read -sp "ssh password:" PASS
     echo ""
-    SSHPASS="sshpass -p $PASS"
+    SSHPASSP="sshpass -p $PASS"
 }
 
 out_parce(){
@@ -254,25 +260,26 @@ option_parce(){
                 DEBUG_FLAG="true"
                 ;;
             -i )
-                SSHKEY="-i $2"
+                SSHKEYI="-i $2"
                 shift
                 ;;
             -s | --sudo)
                 SUDOMODE="sudo"
                 ;;
             -u | --user*)
-                if [[ "$1" =~ "--user" ]] ; then
-                    SSHUSER=$(echo $1 | awk -F= '{ print $2"@" }')
+                if [[ "$1" =~ "--user=" ]] ; then
+                    SSHUSER=$(echo $1 | awk -F= '{ print $2 }')
                 else
-                    SSHUSER="$2@"
+                    SSHUSER="$2"
                     shift
                 fi
+                USERAT="$SSHUSER@"
                 ;;
             -p | --password*)
                 if [[ "$1" =~ "--password" ]] ; then
                     if [[ "$1" =~ "--password=" ]] ; then
                         #--password PASSWORD
-                        SSHPASS=$(echo $1 | awk -F= '{ print "sshpass -p "$2 }')
+                        SSHPASSP=$(echo $1 | awk -F= '{ print "sshpass -p "$2 }')
                     else
                         #--password only
                         pass_parce
@@ -283,7 +290,7 @@ option_parce(){
                         pass_parce
                     else
                         #-p PASSWORD
-                        SSHPASS="sshpass -p $2"
+                        SSHPASSP="sshpass -p $2"
                         shift
                     fi
                 fi
@@ -496,45 +503,45 @@ do
         fi
     
         if [ "$LOGIN_FLAG" == "true" ] ; then
-            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}"
-            ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H}"
+            ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H}
             [ "$ECHO" == "on" ] && echo  ""
         elif [ "$VI_FLAG" == "true" ] ; then
-            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}"
-            ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} vi ${REMOTEFILE}"
+            ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} vi ${REMOTEFILE}
             [ "$ECHO" == "on" ] && echo  ""
         elif [ "$NANO_FLAG" == "true" ] ; then
-            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} nano ${REMOTEFILE}"
-            ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} nano ${REMOTEFILE}
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} nano ${REMOTEFILE}"
+            ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} nano ${REMOTEFILE}
             [ "$ECHO" == "on" ] && echo  ""
         elif [ "$SCP_FLAG" == "true" ] ; then
-            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
-            echo "${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
-            ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} scp ${SSHKEYI}  ${SCP_LOCAL_FILE} ${USERAT}${H}:${SCP_REMOTE_DIR}"
+            echo "${SSHPASSP} scp ${SSHKEYI}  ${SCP_LOCAL_FILE} ${USERAT}${H}:${SCP_REMOTE_DIR}"
+            ${SSHPASSP} scp ${SSHKEYI}  ${SCP_LOCAL_FILE} ${USERAT}${H}:${SCP_REMOTE_DIR}
             [ "$ECHO" == "on" ] && echo  ""
         elif [ -z "${FILE}" ] ; then
             #Execute Command
             if [ -z "${OUTFILE}" ] ; then
-                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\"\""
-                ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
+                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\"\""
+                ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\""
                 [ "$ECHO" == "on" ] && echo  ""
             else
-                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\"\" 2>&1 | tee -a  ${OUTFILE}"
-                echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\" \" "  >>  ${OUTFILE}
-                ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\"" 2>&1 | tee -a  ${OUTFILE}
+                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\"\" 2>&1 | tee -a  ${OUTFILE}"
+                echo "$ ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} \"bash ${BASHVERV} -c \\\"${COMMAND}\\\" \" "  >>  ${OUTFILE}
+                ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} "bash ${BASHVERV} -c \"${COMMAND}\"" 2>&1 | tee -a  ${OUTFILE}
                 [ "$ECHO" == "on" ] && echo  ""
             fi
         else
             #Create Work Directory
-            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} \"[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}\""
-            ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} -q ${SSHUSER}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} -q ${USERAT}${H} \"[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}\""
+            ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} -q ${USERAT}${H} "[ ! -d ${REMOTEWORK} ] && mkdir -p ${REMOTEWORK}"
             [ "$ECHO" == "on" ] && echo  ""
     
             #SCP
             for i in ${FILE_UNIQ}
             do
-                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} scp ${SSHKEY} ${SSHVERV} $i ${SSHUSER}${H}:${REMOTEWORK}"
-                ${SSHPASS} scp ${SSHKEY} ${SSHVERV} $i ${SSHUSER}${H}:${REMOTEWORK}
+                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} scp ${SSHKEYI} ${SSHVERV} $i ${USERAT}${H}:${REMOTEWORK}"
+                ${SSHPASSP} scp ${SSHKEYI} ${SSHVERV} $i ${USERAT}${H}:${REMOTEWORK}
                 [ "$ECHO" == "on" ] && echo  ""
             done
     
@@ -542,13 +549,13 @@ do
             for array in "${arrays[@]}"
             do
                 if [ -z "${OUTFILE}" ] ; then
-                    [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} \"${REMOTEWORK}/${array}\" "
-                    ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"
+                    [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} bash ${BASHVERV} \"${REMOTEWORK}/${array}\" "
+                    ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"
                     [ "$ECHO" == "on" ] && echo  ""
                 else
-                    [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} \"${REMOTEWORK}/${array}\"  2>&1 | tee -a ${OUTFILE}"
-                    echo "$ ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV}  \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
-                    ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
+                    [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} bash ${BASHVERV} \"${REMOTEWORK}/${array}\"  2>&1 | tee -a ${OUTFILE}"
+                    echo "$ ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} bash ${BASHVERV}  \"${REMOTEWORK}/${array}\""  >>  ${OUTFILE}
+                    ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} bash ${BASHVERV} "${REMOTEWORK}/${array}"  2>&1 | tee -a ${OUTFILE}
                     [ "$ECHO" == "on" ] && echo  ""
                 fi
             done
@@ -556,9 +563,9 @@ do
             #Delete file
             for i in ${FILE_UNIQ}
             do
-                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i "
-                #${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H} ls -l ${REMOTEWORK}/$i
-                ${SSHPASS} ssh ${SSHKEY} ${SSHUSER}${H}  rm -f ${REMOTEWORK}/$i
+                [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh ${SSHKEYI} ${USERAT}${H}  rm -f ${REMOTEWORK}/$i "
+                #${SSHPASSP} ssh ${SSHKEYI} ${USERAT}${H} ls -l ${REMOTEWORK}/$i
+                ${SSHPASSP} ssh ${SSHKEYI} ${USERAT}${H}  rm -f ${REMOTEWORK}/$i
             done
         fi
     fi
