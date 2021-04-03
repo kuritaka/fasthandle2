@@ -28,7 +28,8 @@ Options:
                                 Execute ShellScript
     --ping                      check ping test
     --login                     login remote host
-    --vi FILE, --vi=FILE        edit the remote file
+    --vi FILE, --vi=FILE        edit the remote file with vi
+    --nano FILE, --nano=FILE    edit the remote file with nano
     --scp LOCLA_FILE REMOTE_DIR
                                 transport file with scp
 
@@ -81,6 +82,7 @@ Usage:
     fh -H host1 --ping
     fh -H host1 --login
     fh -H host1 --vi FILE
+    fh -H host1 --nano FILE
     fh -H host1 -s --vi FILE   #-s = with sudo
     fh -H host1 --scp LOCAL_FILE  REMOTEDIR
 HELP
@@ -365,6 +367,17 @@ option_parce(){
                     shift
                 fi
                 ;;
+            --nano*)
+                NANO_FLAG="true"
+                if [[ "$1" =~ "--nano=" ]] ; then
+                    #--nano=FILE
+                    REMOTEFILE=$(echo $1 | awk -F= '{ print $2 }')
+                else
+                    #--nano FILE
+                    REMOTEFILE="$2"
+                    shift
+                fi
+                ;;
             --scp)
                 SCP_FLAG="true"
                 #--scp LOCAL_FILE REMOTE_DIR
@@ -483,12 +496,16 @@ do
         fi
     
         if [ "$LOGIN_FLAG" == "true" ] ; then
-            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}"
-            ${SSHPASS} ssh ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}"
+            ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H}
             [ "$ECHO" == "on" ] && echo  ""
         elif [ "$VI_FLAG" == "true" ] ; then
-            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}"
             ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} vi ${REMOTEFILE}
+            [ "$ECHO" == "on" ] && echo  ""
+        elif [ "$NANO_FLAG" == "true" ] ; then
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} nano ${REMOTEFILE}"
+            ${SSHPASS} ssh -t ${SSHVERV} ${SSHKEY} ${SSHUSER}${H} ${SUDOMODE} nano ${REMOTEFILE}
             [ "$ECHO" == "on" ] && echo  ""
         elif [ "$SCP_FLAG" == "true" ] ; then
             [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASS} scp ${SSHKEY}  ${SCP_LOCAL_FILE} ${SSHUSER}${H}:${SCP_REMOTE_DIR}"
