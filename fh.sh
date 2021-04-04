@@ -503,8 +503,8 @@ do
         fi
     
         if [ "$LOGIN_FLAG" == "true" ] ; then
-            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H}"
-            ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H}
+            [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H}"
+            ${SSHPASSP} ssh ${SSHVERV} ${SSHKEYI} ${USERAT}${H}
             [ "$ECHO" == "on" ] && echo  ""
         elif [ "$VI_FLAG" == "true" ] ; then
             [ "$ECHO" == "on" ] && echo "Execute : ${SSHPASSP} ssh -t ${SSHVERV} ${SSHKEYI} ${USERAT}${H} ${SUDOMODE} vi ${REMOTEFILE}"
